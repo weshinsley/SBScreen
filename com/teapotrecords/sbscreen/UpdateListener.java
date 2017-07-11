@@ -26,8 +26,10 @@ public class UpdateListener implements WebListener {
       public void run() {
         final String command = x.get(COMMAND_TAG);
         final String b64code = x.get(LYRICS_TAG);
-        final String html = new String(b64decode.decode(b64code));
-        if (command.equals(LYRICS_TAG)) displayHTML(html);
+        if (b64code!=null) {
+          final String html = new String(b64decode.decode(b64code));
+          if (command.equals(LYRICS_TAG)) displayHTML(html);
+        }
       }
     });
     parent.webEngine.reload();

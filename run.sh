@@ -1,1 +1,1 @@
-javaw com.teapotrecords.sbscreen.SBScreen
+java com.teapotrecords.sbscreen.SBScreen

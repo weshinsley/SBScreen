@@ -1,1 +1,1 @@
-javac com\teapotrecords\SBScreen\*.java
+javac com/teapotrecords/SBScreen/*.java
