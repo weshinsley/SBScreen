@@ -37,7 +37,7 @@ public class UpdateListener implements WebListener {
   
   public synchronized void displayHTML(String html) {
     html="<p style=\"text-align:center;font-family:Arial,Calibri;font-size:28pt;color:#ffffff;text-shadow:2px 2px #000000;\">"+html+"</p>";
-    parent.webEngine.loadContent(html);
+    if (parent.webEngine!=null) parent.webEngine.loadContent(html);
   }
   
 
