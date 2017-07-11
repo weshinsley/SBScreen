@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.w3c.dom.Document;
 
 import com.sun.webkit.WebPage;
+import com.teapotrecords.sbscreen.network.WebServer;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -80,7 +81,10 @@ public class SBScreen extends Application {
   final ImageView iv = new ImageView();
   Image image;
   
-  
+  private WebServer webServer =  null;
+  private UpdateListener updater = null;
+  public WebEngine webEngine = null;
+    
   public void showDisplayScreen() {
     displayStage.setWidth(Integer.parseInt(tf_w.getText()));
     displayStage.setHeight(Integer.parseInt(tf_h.getText()));
@@ -115,7 +119,7 @@ public class SBScreen extends Application {
       displayStageSP.getChildren().add(iv);
       
     }
-    WebEngine webEngine = browser.getEngine();
+    webEngine = browser.getEngine();
     webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
     webEngine.loadContent("<p style=\"text-align:center; font-family:Calibri; color:#ffffff; font-size:24pt;\">Jesus is alive! Jesus is alive!<br/>He has risen from the grave and He's alive!</p>");
     displayStageSP.getChildren().add(browser);
@@ -136,6 +140,12 @@ public class SBScreen extends Application {
   
   @Override
   public void start(Stage primaryStage) throws Exception {
+    // Initialise Network Listener
+    
+    updater = new UpdateListener(this);
+    webServer = new WebServer(updater);
+    webServer.setEnabled(true);
+    
     // Initialise display pane.
     
     displayStage = new Stage(StageStyle.UNDECORATED);
@@ -248,6 +258,10 @@ public class SBScreen extends Application {
     grid.add(b_backdrop,0,6);
     grid.add(tf_backdrop, 1, 6);
     primaryStage.show();
+    
+    // Font 
+    
+    
     
     primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       public void handle(WindowEvent we) {
