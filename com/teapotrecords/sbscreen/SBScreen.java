@@ -17,6 +17,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,9 +26,14 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
@@ -59,18 +65,29 @@ public class SBScreen extends Application {
   final Label l_display = new Label("Display");
   final Label l_location = new Label("Location (x,y)");
   final Label l_size = new Label("Size (w,h)");
+  final Label l_font = new Label("Font Family");
+  final Label l_fontsize = new Label("Font Size");
+  final Label l_cols = new Label("Text Colour");
+  final Label l_port = new Label("Network Port");  
   final ToggleGroup tg_display = new ToggleGroup();
   final HBox hb_display = new HBox();
   final HBox hb_location = new HBox();
   final HBox hb_size = new HBox();
+  final HBox hb_cols = new HBox();
   final GridPane grid = new GridPane();
   final TextField tf_x  = new TextField();
   final TextField tf_y  = new TextField();
   final TextField tf_w  = new TextField();
   final TextField tf_h  = new TextField();
+  final TextField tf_port = new TextField();
   final Button b_detect = new Button("Detect Fullscreen");
   final Button b_backdrop = new Button("Backdrop");
+  final ColorPicker cp_fontcol = new ColorPicker(Color.WHITE);
+  final ColorPicker cp_shadow = new ColorPicker(Color.GRAY);
+  final CheckBox tb_shadow = new CheckBox("Shadow");
   final TextField tf_backdrop = new TextField();
+  ChoiceBox cb_fonts;
+  final Spinner<Integer> sp_fontsize = new Spinner<Integer>();  
   
   final StackPane displayStageSP = new StackPane();
   Scene displayScene = null;
@@ -121,7 +138,6 @@ public class SBScreen extends Application {
     }
     webEngine = browser.getEngine();
     webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
-    webEngine.loadContent("<p style=\"text-align:center; font-family:Calibri; color:#ffffff; font-size:24pt;\">Jesus is alive! Jesus is alive!<br/>He has risen from the grave and He's alive!</p>");
     displayStageSP.getChildren().add(browser);
     displayStage.show();
     if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV")) || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV"))) mp.play();
@@ -140,7 +156,8 @@ public class SBScreen extends Application {
   
   @Override
   public void start(Stage primaryStage) throws Exception {
-    // Initialise Network Listener
+    
+    int gridy=0;
     
     updater = new UpdateListener(this);
     webServer = new WebServer(updater);
@@ -162,12 +179,12 @@ public class SBScreen extends Application {
     grid.setVgap(10);
     grid.setPadding(new Insets(20,20,20,20));
     
-    Scene scene = new Scene(grid, 300,220);
+    Scene scene = new Scene(grid, 300,280);
     primaryStage.setScene(scene);
     
     // Display ON/OFF line
     
-    grid.add(l_display,0,1);
+    grid.add(l_display,0,gridy);
     rb_on.setToggleGroup(tg_display);
     rb_off.setToggleGroup(tg_display);
     hb_display.getChildren().add(rb_off);
@@ -175,7 +192,7 @@ public class SBScreen extends Application {
     rb_off.setPadding(new Insets(0,10,0,10));
     rb_off.setSelected(true);
     hb_display.getChildren().add(rb_on);
-    grid.add(hb_display, 1, 1);
+    grid.add(hb_display, 1, gridy++);
     
     rb_on.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
@@ -191,25 +208,25 @@ public class SBScreen extends Application {
     });
     // Location line
     
-    grid.add(l_location,0,3);
+    grid.add(l_location,0,gridy);
     tf_x.setMaxWidth(50);
     tf_y.setMaxWidth(50);    
     hb_location.getChildren().add(tf_x);
     hb_location.getChildren().add(tf_y);    
-    grid.add(hb_location, 1, 3);
+    grid.add(hb_location, 1, gridy++);
     
     // Size line
     
-    grid.add(l_size,0,4);
+    grid.add(l_size,0,gridy);
     tf_w.setMaxWidth(50);
     tf_h.setMaxWidth(50);    
     hb_size.getChildren().add(tf_w);
     hb_size.getChildren().add(tf_h);    
-    grid.add(hb_size, 1, 4);
+    grid.add(hb_size, 1, gridy++);
     
     // Detect
     
-    grid.add(b_detect, 1, 5);
+    grid.add(b_detect, 1, gridy++);
     b_detect.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
         List<String> choices = new ArrayList<>();
@@ -255,14 +272,39 @@ public class SBScreen extends Application {
         } 
       }
     });
-    grid.add(b_backdrop,0,6);
-    grid.add(tf_backdrop, 1, 6);
+    tf_backdrop.setMaxWidth(150);
+    grid.add(b_backdrop,0,gridy);
+    grid.add(tf_backdrop, 1, gridy++);
     primaryStage.show();
     
-    // Font 
+    // Font family.
     
+    List<String> fonts = javafx.scene.text.Font.getFamilies();
+    cb_fonts = new ChoiceBox(FXCollections.observableArrayList(fonts));
+    cb_fonts.setMaxWidth(150);
+    String default_font;
+    if (fonts.contains("Calibri")) default_font="Calibri";
+    else if (fonts.contains("Arial")) default_font="Arial";
+    else if (fonts.contains("Lucida Grande")) default_font="Lucida Grande";
+    else if (fonts.contains("sans-serif")) default_font="sans-serif";
+    else default_font = fonts.get(0);
+    cb_fonts.getSelectionModel().select(default_font);
+    grid.add(l_font, 0, gridy);
+    grid.add(cb_fonts, 1, gridy++);
     
+    // Font size
     
+    sp_fontsize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(8,64, 28));
+    grid.add(l_fontsize, 0, gridy);
+    grid.add(sp_fontsize, 1, gridy++);
+    
+    // Colours
+    
+    grid.add(l_cols, 0, gridy);
+    grid.add(cp_fontcol,1,gridy++);
+    grid.add(tb_shadow,0,gridy);
+    grid.add(cp_shadow, 1, gridy++);
+        
     primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       public void handle(WindowEvent we) {
         hideDisplayScreen();

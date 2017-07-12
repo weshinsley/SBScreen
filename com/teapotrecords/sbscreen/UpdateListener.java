@@ -7,6 +7,8 @@ import java.util.HashMap;
 import com.teapotrecords.sbscreen.network.WebListener;
 
 import javafx.application.Platform;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.paint.Color;
 
 public class UpdateListener implements WebListener {
   private final String LYRICS_TAG = "lyrics";
@@ -35,8 +37,19 @@ public class UpdateListener implements WebListener {
     parent.webEngine.reload();
   }
   
+  public String toHex(ColorPicker cp) {
+    Color c = cp.getValue();
+    int r = (int) (c.getRed()*100);
+    int g = (int) (c.getGreen()*100);
+    int b = (int) (c.getGreen()*100);
+    return "#"+Integer.toHexString(r)+Integer.toHexString(g)+Integer.toHexString(b);
+    
+  }
   public synchronized void displayHTML(String html) {
-    html="<p style=\"text-align:center;font-family:Arial,Calibri;font-size:28pt;color:#ffffff;text-shadow:2px 2px #000000;\">"+html+"</p>";
+    html="<p style=\"text-align:center;font-family:"+parent.cb_fonts.getSelectionModel().getSelectedItem()+";"+
+        "font-size:"+parent.sp_fontsize.getValue()+"pt;"+
+        "color:"+toHex(parent.cp_fontcol)+";"+
+        (parent.tb_shadow.isSelected()?"text-shadow:2px 2px "+toHex(parent.cp_shadow)+";":"")+"\">"+html+"</p>";
     if (parent.webEngine!=null) parent.webEngine.loadContent(html);
   }
   
