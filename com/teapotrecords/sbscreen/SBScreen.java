@@ -62,15 +62,20 @@ public class SBScreen extends Application {
   
   final RadioButton rb_on = new RadioButton("ON");
   final RadioButton rb_off = new RadioButton("OFF");
+  public final RadioButton nl_on = new RadioButton("ON");
+  public final RadioButton nl_off = new RadioButton("OFF");
   final Label l_display = new Label("Display");
   final Label l_location = new Label("Location (x,y)");
   final Label l_size = new Label("Size (w,h)");
   final Label l_font = new Label("Font Family");
   final Label l_fontsize = new Label("Font Size");
   final Label l_cols = new Label("Text Colour");
-  final Label l_port = new Label("Network Port");  
+  final Label l_port = new Label("Network Port");
+  final Label l_neton = new Label("Net Listener");
   final ToggleGroup tg_display = new ToggleGroup();
+  final ToggleGroup tg_net = new ToggleGroup();
   final HBox hb_display = new HBox();
+  final HBox hb_net = new HBox();
   final HBox hb_location = new HBox();
   final HBox hb_size = new HBox();
   final HBox hb_cols = new HBox();
@@ -79,7 +84,7 @@ public class SBScreen extends Application {
   final TextField tf_y  = new TextField();
   final TextField tf_w  = new TextField();
   final TextField tf_h  = new TextField();
-  final TextField tf_port = new TextField();
+  public final TextField tf_port = new TextField("8080");
   final Button b_detect = new Button("Detect Fullscreen");
   final Button b_backdrop = new Button("Backdrop");
   final ColorPicker cp_fontcol = new ColorPicker(Color.WHITE);
@@ -158,10 +163,7 @@ public class SBScreen extends Application {
   public void start(Stage primaryStage) throws Exception {
     
     int gridy=0;
-    
-    updater = new UpdateListener(this);
-    webServer = new WebServer(updater);
-    webServer.setEnabled(true);
+   
     
     // Initialise display pane.
     
@@ -170,16 +172,18 @@ public class SBScreen extends Application {
     displayScene = new Scene(displayStageSP, displayStage.getWidth(), displayStage.getHeight(),Color.BLACK);
     displayStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
     displayStage.setScene(displayScene);
-        
+    displayStage.setResizable(false);
+    
     // Setup Control GUI.
     primaryStage.setTitle("Songbase Screen");
+    primaryStage.setResizable(false);
     
     grid.setAlignment(Pos.CENTER);
     grid.setHgap(10);
     grid.setVgap(10);
     grid.setPadding(new Insets(20,20,20,20));
     
-    Scene scene = new Scene(grid, 300,280);
+    Scene scene = new Scene(grid, 300,380);
     primaryStage.setScene(scene);
     
     // Display ON/OFF line
@@ -304,7 +308,51 @@ public class SBScreen extends Application {
     grid.add(cp_fontcol,1,gridy++);
     grid.add(tb_shadow,0,gridy);
     grid.add(cp_shadow, 1, gridy++);
-        
+    
+    // Network
+    
+    grid.add(l_neton, 0, gridy);
+    nl_on.setToggleGroup(tg_net);
+    nl_off.setToggleGroup(tg_net);
+    hb_net.getChildren().add(nl_off);
+    nl_on.setPadding(new Insets(0,10,0,10));
+    nl_off.setPadding(new Insets(0,10,0,10));
+    nl_off.setSelected(true);
+    hb_net.getChildren().add(nl_on);
+    grid.add(hb_net, 1, gridy++);
+    
+    nl_on.setOnAction(new EventHandler<ActionEvent>() {
+      public void handle(ActionEvent e) {
+        webServer.setEnabled(true);
+        tf_port.setDisable(true);
+      }
+    });
+    
+    nl_off.setOnAction(new EventHandler<ActionEvent>() {
+      public void handle(ActionEvent e) {
+        webServer.setEnabled(false);
+        tf_port.setDisable(false);        
+      }
+    });
+    
+            
+    grid.add(l_port, 0, gridy);
+    grid.add(tf_port, 1, gridy++);
+    tf_port.setDisable(false);
+    tf_port.focusedProperty().addListener(new ChangeListener<Boolean>() {
+      @Override
+      public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+        int p=8080;
+        try {
+          p = Integer.parseInt(tf_port.getText());
+          if (p<0) p=8080;
+        } catch (Exception e) {}
+        tf_port.setText(String.valueOf(p));
+        webServer.setPort(p);
+      }
+      
+      
+    });
     primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       public void handle(WindowEvent we) {
         hideDisplayScreen();
@@ -312,6 +360,13 @@ public class SBScreen extends Application {
         System.exit(0);
       }
     });       
+
+    
+    
+    updater = new UpdateListener(this);
+    webServer = new WebServer(updater,this);
+    if (nl_on.isSelected()) webServer.setEnabled(true);
+    
     
   }
   

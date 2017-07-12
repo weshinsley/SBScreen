@@ -11,29 +11,52 @@ import java.util.HashMap;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import com.teapotrecords.sbscreen.SBScreen;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 public class WebServer {
   private HttpServer server;
   private int port = 8080;
   private WebListener listener = null;
   private boolean enabled = false;
+  private SBScreen parent;
   
-  public WebServer(WebListener wl) throws IOException {
-    server = HttpServer.create(new InetSocketAddress(port),0);
-    server.createContext("/",new WebHandler());
+  public void createServer() {
+    try {
+      server = HttpServer.create(new InetSocketAddress(port),0);
+      server.createContext("/",new WebHandler());
+    } catch (Exception e) {
+      if (e instanceof java.net.BindException) {
+        Alert portError = new Alert(AlertType.ERROR, "The network port "+port+" is already in use. Please choose another, or close the other application that is using the port.",ButtonType.OK);
+        portError.showAndWait();
+        this.parent.nl_off.setSelected(true);
+        this.parent.tf_port.setDisable(false);
+      }
+    }
+  }
+  
+  public WebServer(WebListener wl, SBScreen parent)  {
+    this.parent=parent;
     listener=wl;
+    createServer();
   }
   
-  public void setPort(int p) throws IOException {
-    setEnabled(false);
+  public void setPort(int p) {
     port=p;
-    setEnabled(true);
   }
   
-  public void setEnabled(boolean en) throws IOException {
+  public void setEnabled(boolean en) {
+    if (server==null) createServer();
+    
     if (enabled!=en) {
-      if (en) server.start();
-      else server.stop(0);
+      if (en) { 
+        if (server!=null) server.start();
+      } else {
+        if (server!=null) server.stop(0);
+      }
       enabled=en;
     }
   }

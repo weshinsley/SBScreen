@@ -14,7 +14,8 @@ public class UpdateListener implements WebListener {
   private final String LYRICS_TAG = "lyrics";
   private final String COMMAND_TAG = "command";
   private Decoder b64decode = Base64.getDecoder();
-  private SBScreen parent;
+  public SBScreen parent = null;
+
   
   public UpdateListener(SBScreen parent) {
     this.parent=parent;
