@@ -71,8 +71,7 @@ public class SBScreen extends Application {
   final RadioButton rb_off = new RadioButton("OFF");
   public final RadioButton nl_on = new RadioButton("ON");
   public final RadioButton nl_off = new RadioButton("OFF");
-  final ObservableList<String> config_choices = FXCollections
-      .observableArrayList();
+  final ObservableList<String> config_choices = FXCollections.observableArrayList();
   final ChoiceBox cb_configs = new ChoiceBox(config_choices);
   final Label l_display = new Label("Display");
   final Label l_location = new Label("Location (x,y)");
@@ -122,19 +121,7 @@ public class SBScreen extends Application {
   private WebServer webServer = null;
   private UpdateListener updater = null;
   public WebEngine webEngine = null;
-
-  public void loadConfig(String name) {
-
-  }
-
-  public void saveConfig(String name) {
-
-  }
-
-  public void deleteConfig(String name) {
-    // Can't be only one.
-  }
-
+  
   public void showDisplayScreen(boolean smoothly) {
     displayStage.setWidth(Integer.parseInt(tf_w.getText()));
     displayStage.setHeight(Integer.parseInt(tf_h.getText()));
@@ -144,8 +131,7 @@ public class SBScreen extends Application {
     displayScene.setFill(Color.BLACK);
 
     String backdrop = tf_backdrop.getText().toUpperCase();
-    if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV"))
-        || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV"))) {
+    if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV")) || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV"))) {
       m = new Media(new File(tf_backdrop.getText()).toURI().toString());
       mp = new MediaPlayer(m);
       mv = new MediaView(mp);
@@ -171,29 +157,24 @@ public class SBScreen extends Application {
     webEngine.loadContent("<p></p>");
     displayStageSP.getChildren().add(browser);
     if (!smoothly) displayStage.show();
-    if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV"))
-        || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV")))
+    if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV")) || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV")))
       mp.play();
   }
 
   public void hideDisplayScreen(boolean smoothly) {
-    if (mp != null)
-      mp.stop();
+    if (mp != null) mp.stop();
     if (!smoothly) displayStage.hide();
-    while (displayStageSP.getChildren().size() > 0)
-      displayStageSP.getChildren().remove(0);
+    while (displayStageSP.getChildren().size() > 0) displayStageSP.getChildren().remove(0);
     mv = null;
     mp = null;
     m = null;
-
   }
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-
     int gridy = 0;
     updater = new UpdateListener(this);
-
+    primaryStage.getIcons().add(new Image("file:sbscreen_icon.png"));
     // Initialise display pane.
 
     displayStage = new Stage(StageStyle.UNDECORATED);
@@ -337,14 +318,10 @@ public class SBScreen extends Application {
     cb_fonts = new ChoiceBox(FXCollections.observableArrayList(fonts));
     cb_fonts.setMaxWidth(150);
     String default_font;
-    if (fonts.contains("Calibri"))
-      default_font = "Calibri";
-    else if (fonts.contains("Arial"))
-      default_font = "Arial";
-    else if (fonts.contains("Lucida Grande"))
-      default_font = "Lucida Grande";
-    else if (fonts.contains("sans-serif"))
-      default_font = "sans-serif";
+    if (fonts.contains("Calibri")) default_font = "Calibri";
+    else if (fonts.contains("Arial")) default_font = "Arial";
+    else if (fonts.contains("Lucida Grande")) default_font = "Lucida Grande";
+    else if (fonts.contains("sans-serif")) default_font = "sans-serif";
     else
       default_font = fonts.get(0);
     cb_fonts.getSelectionModel().select(default_font);
@@ -353,8 +330,7 @@ public class SBScreen extends Application {
 
     // Font size
 
-    sp_fontsize.setValueFactory(
-        new SpinnerValueFactory.IntegerSpinnerValueFactory(8, 64, 28));
+    sp_fontsize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(8, 64, 28));
     grid.add(l_fontsize, 0, gridy);
     grid.add(sp_fontsize, 1, gridy++);
 
