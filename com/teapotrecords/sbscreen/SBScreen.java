@@ -564,12 +564,10 @@ public class SBScreen extends Application {
   public void createDummyXML() {
     try {
       PrintWriter PW = new PrintWriter(new File("configs.xml"));
-      PW.println(
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
+      PW.println("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
       PW.println("<configs>");
-      PW.println("  <recent>Default Config</recent>");
-      PW.println(
-          "    <config name=\"Default Config\" x=\"1920\" y=\"0\" w=\"1920\" h=\"1080\" b=\"\" f=\"Arial\" fs=\"28\" c=\"#ffffff\" sh=\"1\" sc=\"#808080\" p=\"8080\" />");
+      PW.println("  <recent name=\"Default Config\"/>");
+      PW.println("    <config name=\"Default Config\" x=\"1920\" y=\"0\" w=\"1920\" h=\"1080\" b=\"\" f=\"Arial\" fs=\"28\" c=\"#ffffff\" sh=\"1\" sc=\"#808080\" p=\"8080\" />");
       PW.println("</configs>");
       PW.close();
     } catch (Exception e) {
@@ -584,10 +582,8 @@ public class SBScreen extends Application {
     Tools.setAttribute(tag, "p", tf_port.getText());
     Tools.setAttribute(tag, "b", tf_backdrop.getText());
     Tools.setAttribute(tag, "sh", (tb_shadow.isSelected() ? "1" : "0"));
-    Tools.setAttribute(tag, "fs",
-        String.valueOf(sp_fontsize.getValueFactory().getValue()));
-    Tools.setAttribute(tag, "f",
-        cb_fonts.getSelectionModel().getSelectedItem().toString());
+    Tools.setAttribute(tag, "fs", String.valueOf(sp_fontsize.getValueFactory().getValue()));
+    Tools.setAttribute(tag, "f", cb_fonts.getSelectionModel().getSelectedItem().toString());
     Tools.setAttribute(tag, "c", Tools.toHex(cp_fontcol));
     Tools.setAttribute(tag, "sc", Tools.toHex(cp_shadow));
   }
@@ -614,8 +610,7 @@ public class SBScreen extends Application {
   }
 
   public void loadXML() {
-    if (!new File("configs.xml").exists())
-      createDummyXML();
+    if (!new File("configs.xml").exists()) createDummyXML();
     configs_xml = Tools.loadDocument("configs.xml");
     int countConfigs = Tools.countChildren(configs_xml, "config");
     if (countConfigs == 0) {
@@ -623,12 +618,10 @@ public class SBScreen extends Application {
       configs_xml = Tools.loadDocument("configs.xml");
     }
     for (int i = 0; i < Tools.countChildren(configs_xml, "config"); i++) {
-      config_choices.add(Tools
-          .getAttribute(Tools.getChildNo(configs_xml, "config", i), "name"));
+      config_choices.add(Tools.getAttribute(Tools.getChildNo(configs_xml, "config", i), "name"));
     }
     FXCollections.sort(config_choices);
-    String recent = Tools.getAttribute(Tools.getTag(configs_xml, "recent"),
-        "name");
+    String recent = Tools.getAttribute(Tools.getTag(configs_xml, "recent"),"name");
     cb_configs.getSelectionModel().select(recent);
 
     Node config = Tools.getTagWhereAttr(configs_xml, "config", "name", recent);
