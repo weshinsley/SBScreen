@@ -72,7 +72,7 @@ public class SBScreen extends Application {
   public final RadioButton nl_on = new RadioButton("ON");
   public final RadioButton nl_off = new RadioButton("OFF");
   final ObservableList<String> config_choices = FXCollections.observableArrayList();
-  final ChoiceBox cb_configs = new ChoiceBox(config_choices);
+  final ChoiceBox<String> cb_configs = new ChoiceBox<String>(config_choices);
   final Label l_display = new Label("Display");
   final Label l_location = new Label("Location (x,y)");
   final Label l_size = new Label("Size (w,h)");
@@ -105,7 +105,7 @@ public class SBScreen extends Application {
   final ColorPicker cp_shadow = new ColorPicker(Color.GRAY);
   final CheckBox tb_shadow = new CheckBox("Shadow");
   final TextField tf_backdrop = new TextField();
-  ChoiceBox cb_fonts;
+  ChoiceBox<String> cb_fonts;
   final Spinner<Integer> sp_fontsize = new Spinner<Integer>();
 
   final StackPane displayStageSP = new StackPane();
@@ -175,27 +175,10 @@ public class SBScreen extends Application {
     int gridy = 0;
     updater = new UpdateListener(this);
     primaryStage.getIcons().add(new Image("file:sbscreen_icon.png"));
-    // Initialise display pane.
-
-    displayStage = new Stage(StageStyle.UNDECORATED);
-    displayStage.setAlwaysOnTop(true);
-    displayScene = new Scene(displayStageSP, displayStage.getWidth(),
-        displayStage.getHeight(), Color.BLACK);
-    displayStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-    displayStage.setScene(displayScene);
-    // displayStage.setResizable(false);
-
-    // Setup Control GUI.
-    primaryStage.setTitle("Songbase Screen");
-    primaryStage.setResizable(false);
-
     grid.setAlignment(Pos.CENTER);
     grid.setHgap(10);
     grid.setVgap(10);
     grid.setPadding(new Insets(20, 20, 20, 20));
-
-    Scene scene = new Scene(grid, 300, 470);
-    primaryStage.setScene(scene);
 
     // Display ON/OFF line
 
@@ -263,8 +246,7 @@ public class SBScreen extends Application {
               + "," + (int) bounds.getMinY() + ")");
           scr_no++;
         }
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(
-            choices.get(choices.size() - 1), choices);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(choices.size() - 1), choices);
         dialog.setTitle("Screen detection");
         dialog.setHeaderText("Screens Detected:");
         dialog.setContentText("Choose screen: ");
@@ -280,7 +262,6 @@ public class SBScreen extends Application {
           tf_y.setText(String.valueOf((int) bounds.getMinY()));
           unsaved_changes = true;
           b_saveConfig.setDisable(false);
-
         }
       }
     });
@@ -294,8 +275,7 @@ public class SBScreen extends Application {
         fileChooser.setTitle("Choose BackDrop Image/Movie");
         fileChooser.getExtensionFilters().addAll(
             new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-            new ExtensionFilter("Movie Files", "*.mp4", "*.avi", "*.wmv",
-                "*.mov"),
+            new ExtensionFilter("Movie Files", "*.mp4", "*.avi", "*.wmv", "*.mov"),
             new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(_stage);
         if (selectedFile != null) {
@@ -307,23 +287,22 @@ public class SBScreen extends Application {
         showDisplayScreen(true);
       }
     });
+    tf_backdrop.setEditable(false);
     tf_backdrop.setMaxWidth(150);
     grid.add(b_backdrop, 0, gridy);
     grid.add(tf_backdrop, 1, gridy++);
-    primaryStage.show();
-
+    
     // Font family.
 
     List<String> fonts = javafx.scene.text.Font.getFamilies();
-    cb_fonts = new ChoiceBox(FXCollections.observableArrayList(fonts));
+    cb_fonts = new ChoiceBox<String>(FXCollections.observableArrayList(fonts));
     cb_fonts.setMaxWidth(150);
     String default_font;
     if (fonts.contains("Calibri")) default_font = "Calibri";
     else if (fonts.contains("Arial")) default_font = "Arial";
     else if (fonts.contains("Lucida Grande")) default_font = "Lucida Grande";
     else if (fonts.contains("sans-serif")) default_font = "sans-serif";
-    else
-      default_font = fonts.get(0);
+    else default_font = fonts.get(0);
     cb_fonts.getSelectionModel().select(default_font);
     grid.add(l_font, 0, gridy);
     grid.add(cb_fonts, 1, gridy++);
@@ -370,15 +349,14 @@ public class SBScreen extends Application {
     grid.add(l_port, 0, gridy);
     grid.add(tf_port, 1, gridy++);
     tf_port.setDisable(false);
+    
     tf_port.focusedProperty().addListener(new ChangeListener<Boolean>() {
       @Override
-      public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1,
-          Boolean arg2) {
+      public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
         int p = 8080;
         try {
           p = Integer.parseInt(tf_port.getText());
-          if (p < 0)
-            p = 8080;
+          if (p < 0) p = 8080;
         } catch (Exception e) {
         }
         tf_port.setText(String.valueOf(p));
@@ -386,8 +364,8 @@ public class SBScreen extends Application {
         unsaved_changes = true;
         b_saveConfig.setDisable(false);
       }
-
     });
+
     primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       public void handle(WindowEvent we) {
         hideDisplayScreen(false);
@@ -395,17 +373,17 @@ public class SBScreen extends Application {
         System.exit(0);
       }
     });
+    
+    
 
     b_saveConfig.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent e) {
-        Node configTag = Tools.getTagWhereAttr(configs_xml, "config", "name",
-            cb_configs.getValue().toString());
+        Node configTag = Tools.getTagWhereAttr(configs_xml, "config", "name", cb_configs.getValue().toString());
         GUItoXML(configTag);
         Tools.writeXML(configs_xml, "configs.xml");
         unsaved_changes = false;
         b_saveConfig.setDisable(true);
-
       }
     });
 
@@ -415,28 +393,25 @@ public class SBScreen extends Application {
         TextInputDialog tid = new TextInputDialog();
         tid.setTitle("Please enter name for new config");
         tid.setHeaderText(null);
-        ;
+        
         Optional<String> result = tid.showAndWait();
         if (result.isPresent()) {
           String res = result.get().trim();
-          if (Tools.getTagWhereAttr(configs_xml, "config", "name",
-              res) != null) {
-            Alert dupError = new Alert(AlertType.ERROR,
-                "A configuration with that name already exists.",
-                ButtonType.OK);
+          if (Tools.getTagWhereAttr(configs_xml, "config", "name", res) != null) {
+            Alert dupError = new Alert(AlertType.ERROR, "A configuration with that name already exists.", ButtonType.OK);
             dupError.showAndWait();
           } else {
             Element n = Tools.addTag(configs_xml, "config");
             Tools.setAttribute(n, "name", res);
             GUItoXML(n);
-            Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name",
-                res);
+            Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name", res);
             Tools.writeXML(configs_xml, "configs.xml");
+            unsaved_changes = false;
+            b_saveConfig.setDisable(true);
             config_choices.add(res);
             FXCollections.sort(config_choices);
             cb_configs.getSelectionModel().select(res);
-            unsaved_changes = false;
-            b_saveConfig.setDisable(true);
+            
           }
         }
       }
@@ -446,26 +421,19 @@ public class SBScreen extends Application {
       @Override
       public void handle(ActionEvent e) {
         if (Tools.countChildren(configs_xml, "config") <= 1) {
-          Alert zeroError = new Alert(AlertType.ERROR,
-              "Can't delete the only configuration...", ButtonType.OK);
+          Alert zeroError = new Alert(AlertType.ERROR,"Can't delete the only configuration...", ButtonType.OK);
           zeroError.showAndWait();
         } else {
-          Alert confirmDel = new Alert(AlertType.CONFIRMATION,
-              "Confirm deleting this configuration...", ButtonType.OK,
-              ButtonType.CANCEL);
+          Alert confirmDel = new Alert(AlertType.CONFIRMATION, "Confirm deleting this configuration...", ButtonType.OK, ButtonType.CANCEL);
           Optional<ButtonType> result = confirmDel.showAndWait();
           if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
-            Node x = Tools.getTagWhereAttr(configs_xml, "config", "name",
-                cb_configs.getValue().toString());
+            Node x = Tools.getTagWhereAttr(configs_xml, "config", "name", cb_configs.getValue().toString());
             x.getParentNode().removeChild(x);
-            int index = config_choices
-                .indexOf(cb_configs.getValue().toString());
+            int index = config_choices.indexOf(cb_configs.getValue().toString());
             config_choices.remove(index);
-            while (index >= config_choices.size())
-              index--;
+            while (index >= config_choices.size()) index--;
             cb_configs.getSelectionModel().select(index);
-            Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name",
-                cb_configs.getValue().toString());
+            Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name", cb_configs.getValue().toString());
             Tools.writeXML(configs_xml, "configs.xml");
             unsaved_changes = false;
             b_saveConfig.setDisable(true);
@@ -474,38 +442,31 @@ public class SBScreen extends Application {
       }
     });
 
-    cb_configs.getSelectionModel().selectedItemProperty()
-        .addListener(new ChangeListener<String>() {
-          @Override
-          public void changed(ObservableValue<? extends String> observableValue,
-              String number, String number2) {
-            boolean proceed = (!unsaved_changes);
-            if (unsaved_changes) {
-              Alert confirmDel = new Alert(AlertType.CONFIRMATION,
-                  "There are unsaved changes to this configuration. Proceed anyway?",
-                  ButtonType.OK, ButtonType.CANCEL);
-              Optional<ButtonType> result = confirmDel.showAndWait();
-              if ((result.isPresent()) && (result.get() == ButtonType.OK))
-                proceed = true;
-            }
-            if (proceed) {
-              cb_configs.getSelectionModel().select(number2);
-
-              Node config = Tools.getTagWhereAttr(configs_xml, "config", "name",
-                  cb_configs.getValue().toString());
-              XMLtoGUI(config);
-              Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name",
-                  cb_configs.getValue().toString());
-              Tools.writeXML(configs_xml, "configs.xml");
-              unsaved_changes = false;
-              b_saveConfig.setDisable(true);
-            } else {
-              cb_configs.getSelectionModel().select(number);
-            }
-
-          }
-
-        });
+    cb_configs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observableValue, String number, String number2) {
+        boolean proceed = (!unsaved_changes);
+        if (unsaved_changes) {
+          Alert confirmDel = new Alert(AlertType.CONFIRMATION,
+              "There are unsaved changes to this configuration. Proceed anyway?",
+              ButtonType.OK, ButtonType.CANCEL);
+          Optional<ButtonType> result = confirmDel.showAndWait();
+          if ((result.isPresent()) && (result.get() == ButtonType.OK)) proceed = true;
+        }
+        
+        if (proceed) {
+          cb_configs.getSelectionModel().select(number2);
+          Node config = Tools.getTagWhereAttr(configs_xml, "config", "name",cb_configs.getValue().toString());
+          XMLtoGUI(config);
+          Tools.setAttribute(Tools.getTag(configs_xml, "recent"), "name", cb_configs.getValue().toString());
+          Tools.writeXML(configs_xml, "configs.xml");
+          unsaved_changes = false;
+          b_saveConfig.setDisable(true);
+        } else {
+          cb_configs.getSelectionModel().select(number);
+        }
+      }
+    });
 
     EventHandler<ActionEvent> unsaveAndResizeEvent = new EventHandler<ActionEvent>() {
       @Override
@@ -532,10 +493,11 @@ public class SBScreen extends Application {
     tf_y.setOnAction(unsaveAndResizeEvent);
     tf_w.setOnAction(unsaveAndResizeEvent);
     tf_h.setOnAction(unsaveAndResizeEvent);
+    
+    
     sp_fontsize.valueProperty().addListener(new ChangeListener<Number>() {
       @Override
-      public void changed(ObservableValue<? extends Number> observable,
-          Number oldValue, Number newValue) {
+      public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
         unsaved_changes = true;
         b_saveConfig.setDisable(false);
         updater.refresh();
@@ -548,16 +510,37 @@ public class SBScreen extends Application {
     cp_shadow.setOnAction(unsaveAndRefreshEvent);
     tb_shadow.setOnAction(unsaveAndRefreshEvent);
 
+    displayStage = new Stage(StageStyle.UNDECORATED);
+    displayStage.getIcons().add(new Image("file:sbscreen_icon.png"));
+    displayStage.setAlwaysOnTop(true);
+    displayScene = new Scene(displayStageSP, displayStage.getWidth(), displayStage.getHeight(), Color.BLACK);
+    displayStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+    displayStage.setScene(displayScene);
+    displayStage.setResizable(false);
+    
+    displayStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+      public void handle(WindowEvent we) {
+        hideDisplayScreen(false);
+        rb_off.setSelected(true);
+      }
+    });
+    
+    
     loadXML();
     b_saveConfig.setDisable(true);
     unsaved_changes = false;
 
     webServer = new WebServer(updater, this);
-    if (nl_on.isSelected())
-      webServer.setEnabled(true);
+    if (nl_on.isSelected()) webServer.setEnabled(true);
     webEngine = browser.getEngine();
-    webEngine.documentProperty()
-        .addListener(new WebDocumentListener(webEngine));
+    webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
+    Scene scene = new Scene(grid);
+    primaryStage.setScene(scene);
+    primaryStage.sizeToScene();
+    primaryStage.setTitle("Songbase Screen");
+    primaryStage.setResizable(false);
+    primaryStage.show();
+
 
   }
 
@@ -596,8 +579,7 @@ public class SBScreen extends Application {
     tf_port.setText(Tools.getAttribute(tag, "p"));
     tf_backdrop.setText(Tools.getAttribute(tag, "b"));
     tb_shadow.setSelected(Tools.getAttribute(tag, "sh").equals("1"));
-    sp_fontsize.getValueFactory()
-        .setValue(Integer.parseInt(Tools.getAttribute(tag, "fs")));
+    sp_fontsize.getValueFactory().setValue(Integer.parseInt(Tools.getAttribute(tag, "fs")));
     cb_fonts.getSelectionModel().select(Tools.getAttribute(tag, "f"));
     Tools.fromHex(Tools.getAttribute(tag, "c"), cp_fontcol);
     Tools.fromHex(Tools.getAttribute(tag, "sc"), cp_shadow);
@@ -622,10 +604,12 @@ public class SBScreen extends Application {
     }
     FXCollections.sort(config_choices);
     String recent = Tools.getAttribute(Tools.getTag(configs_xml, "recent"),"name");
+    if (!config_choices.contains(recent)) {
+      recent = Tools.getAttribute(Tools.getChildNo(configs_xml,"config",0),"name");
+      Tools.setAttribute(Tools.getTag(configs_xml, "recent"),"name",recent);
+      Tools.writeXML(configs_xml, "configs.xml");
+    }
     cb_configs.getSelectionModel().select(recent);
-
-    Node config = Tools.getTagWhereAttr(configs_xml, "config", "name", recent);
-    XMLtoGUI(config);
   }
 
   public static void main(String[] args) {
@@ -633,19 +617,18 @@ public class SBScreen extends Application {
   }
 
   protected class WebDocumentListener implements ChangeListener<Document> {
-    private final WebEngine webEngine;
+    private final WebEngine wdl_webEngine;
 
     public WebDocumentListener(WebEngine webEngine) {
-      this.webEngine = webEngine;
+      wdl_webEngine = webEngine;
     }
 
     @Override
-    public void changed(ObservableValue<? extends Document> arg0, Document arg1,
-        Document arg2) {
+    public void changed(ObservableValue<? extends Document> arg0, Document arg1, Document arg2) {
       try {
-        Field f = webEngine.getClass().getDeclaredField("page");
+        Field f = wdl_webEngine.getClass().getDeclaredField("page");
         f.setAccessible(true);
-        com.sun.webkit.WebPage page = (WebPage) f.get(webEngine);
+        com.sun.webkit.WebPage page = (WebPage) f.get(wdl_webEngine);
         page.setBackgroundColor((new java.awt.Color(0, 0, 0, 0)).getRGB());
       } catch (Exception e) {
         e.printStackTrace();
