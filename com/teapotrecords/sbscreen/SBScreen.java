@@ -44,7 +44,9 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -525,6 +527,19 @@ public class SBScreen extends Application {
       }
     });
     
+    displayScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent e) {
+        if (e.getCode()==KeyCode.ESCAPE) {
+          hideDisplayScreen(false);
+          rb_off.setSelected(true);
+        }
+      }
+    });
+    
+    
+    
+    
     
     loadXML();
     b_saveConfig.setDisable(true);
@@ -535,6 +550,16 @@ public class SBScreen extends Application {
     webEngine = browser.getEngine();
     webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
     Scene scene = new Scene(grid);
+    scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent e) {
+        if (e.getCode()==KeyCode.ESCAPE) {
+          hideDisplayScreen(false);
+          rb_off.setSelected(true);
+        }
+      }
+    });
+
     primaryStage.setScene(scene);
     primaryStage.sizeToScene();
     primaryStage.setTitle("Songbase Screen");
