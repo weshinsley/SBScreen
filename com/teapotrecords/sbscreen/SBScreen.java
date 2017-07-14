@@ -158,6 +158,7 @@ public class SBScreen extends Application {
 
     }
     webEngine.loadContent("<p></p>");
+    webEngine.setUserStyleSheetLocation("display.css");
     webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
       @Override
       public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
@@ -188,7 +189,7 @@ public class SBScreen extends Application {
     int gridy = 0;
     updater = new UpdateListener(this);
     
-    primaryStage.getIcons().add(new Image("file:sbscreen_icon.png"));
+    primaryStage.getIcons().add(new Image("file:resources/sbscreen_icon.png"));
     grid.setAlignment(Pos.CENTER);
     grid.setHgap(10);
     grid.setVgap(10);
@@ -535,7 +536,7 @@ public class SBScreen extends Application {
     tb_shadow.setOnAction(unsaveAndRefreshEvent);
 
     displayStage = new Stage(StageStyle.UNDECORATED);
-    displayStage.getIcons().add(new Image("file:sbscreen_icon.png"));
+    displayStage.getIcons().add(new Image("file:resources/sbscreen_icon.png"));
     displayStage.setAlwaysOnTop(true);
     displayScene = new Scene(displayStageSP, displayStage.getWidth(), displayStage.getHeight(), Color.BLACK);
     displayStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
