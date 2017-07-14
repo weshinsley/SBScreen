@@ -21,6 +21,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -157,7 +158,17 @@ public class SBScreen extends Application {
 
     }
     webEngine.loadContent("<p></p>");
+    webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+      @Override
+      public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
+        if (newValue == State.SUCCEEDED) {
+          String scriptCode = "document.style.overflow = 'hidden';";
+          webEngine.executeScript(scriptCode);
+        }
+      }
+    });    
     displayStageSP.getChildren().add(browser);
+    
     if (!smoothly) displayStage.show();
     if ((backdrop.endsWith(".MP4")) || (backdrop.endsWith(".MOV")) || (backdrop.endsWith(".AVI")) || (backdrop.endsWith(".WMV")))
       mp.play();
@@ -548,10 +559,7 @@ public class SBScreen extends Application {
       }
     });
     
-    
-    
-    
-    
+       
     loadXML();
     b_saveConfig.setDisable(true);
     unsaved_changes = false;
