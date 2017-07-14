@@ -21,19 +21,25 @@ public class WebServer {
   private HttpServer server;
   private int port = 8080;
   private WebListener listener = null;
-  private boolean enabled = false;
   private SBScreen parent;
   
   public void createServer() {
     try {
       server = HttpServer.create(new InetSocketAddress(port),0);
       server.createContext("/",new WebHandler());
+      parent.no_events++;
+      this.parent.nl_on.setSelected(true);
+      this.parent.tf_port.setDisable(true);
+      parent.no_events--;
     } catch (Exception e) {
       if (e instanceof java.net.BindException) {
         Alert portError = new Alert(AlertType.ERROR, "The network port "+port+" is already in use. Please choose another, or close the other application that is using the port.",ButtonType.OK);
         portError.showAndWait();
+        parent.no_events++;
         this.parent.nl_off.setSelected(true);
         this.parent.tf_port.setDisable(false);
+        parent.no_events--;
+        server=null;
       }
     }
   }
@@ -51,13 +57,15 @@ public class WebServer {
   public void setEnabled(boolean en) {
     if (server==null) createServer();
     
-    if (enabled!=en) {
-      if (en) { 
-        if (server!=null) server.start();
-      } else {
-        if (server!=null) server.stop(0);
+    if (en) { 
+      if (server!=null) {
+        server.start();
       }
-      enabled=en;
+    } else {
+      if (server!=null) {
+        server.stop(0);
+        server=null;
+      }
     }
   }
   

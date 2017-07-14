@@ -68,7 +68,7 @@ public class SBScreen extends Application {
   boolean unsaved_changes = false;
 
   // Control GUI components
-
+  public int no_events = 0;
   final RadioButton rb_on = new RadioButton("ON");
   final RadioButton rb_off = new RadioButton("OFF");
   public final RadioButton nl_on = new RadioButton("ON");
@@ -176,6 +176,7 @@ public class SBScreen extends Application {
   public void start(Stage primaryStage) throws Exception {
     int gridy = 0;
     updater = new UpdateListener(this);
+    
     primaryStage.getIcons().add(new Image("file:sbscreen_icon.png"));
     grid.setAlignment(Pos.CENTER);
     grid.setHgap(10);
@@ -330,21 +331,31 @@ public class SBScreen extends Application {
     hb_net.getChildren().add(nl_off);
     nl_on.setPadding(new Insets(0, 10, 0, 10));
     nl_off.setPadding(new Insets(0, 10, 0, 10));
+    no_events++;
     nl_off.setSelected(true);
+    no_events--;
     hb_net.getChildren().add(nl_on);
     grid.add(hb_net, 1, gridy++);
 
     nl_on.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
-        webServer.setEnabled(true);
-        tf_port.setDisable(true);
+        System.out.println("ON: ne="+no_events);
+        if (no_events==0) {
+          no_events++;
+          webServer.setEnabled(true);
+          no_events--;
+        }
       }
     });
 
     nl_off.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
-        webServer.setEnabled(false);
-        tf_port.setDisable(false);
+        if (no_events==0) {
+          no_events++;
+          webServer.setEnabled(false);
+          tf_port.setDisable(false);
+          no_events--;
+        }
       }
     });
 
@@ -546,7 +557,6 @@ public class SBScreen extends Application {
     unsaved_changes = false;
 
     webServer = new WebServer(updater, this);
-    if (nl_on.isSelected()) webServer.setEnabled(true);
     webEngine = browser.getEngine();
     webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
     Scene scene = new Scene(grid);
