@@ -1,1 +1,1 @@
-javac com/teapotrecords/SBScreen/*.java
+javac -Xlint:unchecked com/teapotrecords/SBScreen/*.java
