@@ -48,7 +48,7 @@ public class UpdateListener implements WebListener {
     html="<p style=\"text-align:center;font-family:"+parent.cb_fonts.getSelectionModel().getSelectedItem()+";"+
         "font-size:"+parent.sp_fontsize.getValue()+"pt;"+
         "color:"+Tools.toHex(parent.cp_fontcol)+";"+
-        (parent.tb_shadow.isSelected()?"text-shadow:2px 2px "+Tools.toHex(parent.cp_shadow)+";":"")+"\">"+html+"</p>";
+        (parent.tb_shadow.isSelected()?"text-shadow:1px 1px "+Tools.toHex(parent.cp_shadow)+";":"")+"\">"+html+"</p>";
     if (parent.webEngine!=null) parent.webEngine.loadContent(html);
   }
   

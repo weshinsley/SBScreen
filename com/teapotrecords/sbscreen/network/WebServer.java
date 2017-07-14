@@ -30,6 +30,7 @@ public class WebServer {
       parent.no_events++;
       this.parent.nl_on.setSelected(true);
       this.parent.tf_port.setDisable(true);
+      server.start();
       parent.no_events--;
     } catch (Exception e) {
       if (e instanceof java.net.BindException) {
