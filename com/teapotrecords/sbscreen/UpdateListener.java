@@ -45,10 +45,10 @@ public class UpdateListener implements WebListener {
   
   public synchronized void displayHTML(String html) {
     remember_html=html;
-    html="<p style=\"text-align:center;font-family:"+parent.cb_fonts.getSelectionModel().getSelectedItem()+";"+
+    html="<body style=\"overflow-x:hidden;overflow-y:hidden\"><p style=\"text-align:center;font-family:"+parent.cb_fonts.getSelectionModel().getSelectedItem()+";"+
         "font-size:"+parent.sp_fontsize.getValue()+"pt;"+
         "color:"+Tools.toHex(parent.cp_fontcol)+";"+
-        (parent.tb_shadow.isSelected()?"text-shadow:1px 1px "+Tools.toHex(parent.cp_shadow)+";":"")+"\">"+html+"</p>";
+        (parent.tb_shadow.isSelected()?"text-shadow:1px 1px "+Tools.toHex(parent.cp_shadow)+";":"")+"\">"+html+"</p></body>";
     if (parent.webEngine!=null) parent.webEngine.loadContent(html);
   }
   

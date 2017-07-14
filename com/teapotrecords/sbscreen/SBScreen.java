@@ -158,16 +158,6 @@ public class SBScreen extends Application {
 
     }
     webEngine.loadContent("<p></p>");
-    webEngine.setUserStyleSheetLocation("display.css");
-    webEngine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
-      @Override
-      public void changed(ObservableValue<? extends State> observable, State oldValue, State newValue) {
-        if (newValue == State.SUCCEEDED) {
-          String scriptCode = "document.style.overflow = 'hidden';";
-          webEngine.executeScript(scriptCode);
-        }
-      }
-    });    
     displayStageSP.getChildren().add(browser);
     
     if (!smoothly) displayStage.show();
