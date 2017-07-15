@@ -103,7 +103,7 @@ public class WebServer {
        }
        String response = "OK";
        if (key_values.get(UpdateListener.COMMAND_TAG).equals(UpdateListener.INFO_TAG)) {
-         response = "SBS\t"+SBScreen.sbs_version;
+         response = SBScreen.sbs_version;
        }
        t.sendResponseHeaders(200, response.length());
        OutputStream os = t.getResponseBody();
