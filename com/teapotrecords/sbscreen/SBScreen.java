@@ -67,7 +67,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public class SBScreen extends Application {
-  public final static String sbs_version = "0.22 BETA";
+  public final static String sbs_version = "0.22";
   
   Stage displayStage;
   boolean unsaved_changes = false;
