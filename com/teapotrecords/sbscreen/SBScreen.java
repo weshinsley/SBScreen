@@ -3,7 +3,10 @@ package com.teapotrecords.sbscreen;
 import java.io.File;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +24,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -65,9 +67,11 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public class SBScreen extends Application {
+  public final static String sbs_version = "0.21 BETA";
+  
   Stage displayStage;
   boolean unsaved_changes = false;
-
+  
   // Control GUI components
   public int no_events = 0;
   final RadioButton rb_on = new RadioButton("ON");
@@ -104,6 +108,8 @@ public class SBScreen extends Application {
   final Button b_saveConfig = new Button("Save");
   final Button b_saveAsConfig = new Button("Save As");
   final Button b_delConfig = new Button("Delete");
+  final Button b_netInfo = new Button("Net Info");
+  final Button b_appInfo = new Button("App Info");  
   final ColorPicker cp_fontcol = new ColorPicker(Color.WHITE);
   final ColorPicker cp_shadow = new ColorPicker(Color.GRAY);
   final CheckBox tb_shadow = new CheckBox("Shadow");
@@ -180,6 +186,9 @@ public class SBScreen extends Application {
     updater = new UpdateListener(this);
     
     primaryStage.getIcons().add(new Image("file:resources/sbscreen_icon.png"));
+    
+    
+    
     grid.setAlignment(Pos.CENTER);
     grid.setHgap(10);
     grid.setVgap(10);
@@ -338,7 +347,7 @@ public class SBScreen extends Application {
     no_events--;
     hb_net.getChildren().add(nl_on);
     grid.add(hb_net, 1, gridy++);
-
+    
     nl_on.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
         System.out.println("ON: ne="+no_events);
@@ -363,6 +372,7 @@ public class SBScreen extends Application {
 
     grid.add(l_port, 0, gridy);
     grid.add(tf_port, 1, gridy++);
+    
     tf_port.setDisable(false);
     
     tf_port.focusedProperty().addListener(new ChangeListener<Boolean>() {
@@ -389,8 +399,52 @@ public class SBScreen extends Application {
       }
     });
     
+    grid.add(b_appInfo, 0, gridy);
+    grid.add(b_netInfo, 1,gridy++);
+    b_netInfo.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent e) {
+        String s="",t="";
+        int c=0;
+        try {
+          Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+          while (nets.hasMoreElements()) {
+            NetworkInterface intf = nets.nextElement();
+            Enumeration<InetAddress> ips = intf.getInetAddresses();
+            while (ips.hasMoreElements()) {
+              InetAddress ia = ips.nextElement();
+              if (!ia.isLoopbackAddress()) {
+                t=ia.getHostAddress().toString()+"\n";
+                c++;
+                if (t.indexOf(".")>0) s+=t;
+              }
+            }
+          }
+        } catch (Exception ex) {}
+        Alert info = new Alert(AlertType.INFORMATION);
+        info.setTitle("Network Information");
+        if (c==1) info.setHeaderText("Listening for requests on this IP address:");
+        else if (c>1) info.setHeaderText("Listening for requests on these IP addresses:");
+        else if (c<=0) info.setHeaderText("Error - I don't seem to have an IP address to listen with.");
+        info.setContentText(s);
+        info.show();
+        
+      }
+    });
     
+    b_appInfo.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent e) {
+        Alert info = new Alert(AlertType.INFORMATION);
+        info.setTitle("About SBScreen");
+        info.setHeaderText("SBScreen "+sbs_version);
+        info.setContentText("15 July 2017\nwes@teapotrecords.co.uk\nhttps://github.com/weshinsley/SBScreen"); 
+        info.show();
+      }
+    });
 
+
+    
     b_saveConfig.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent e) {
@@ -486,12 +540,7 @@ public class SBScreen extends Application {
     EventHandler<ActionEvent> unsaveAndResizeEvent = new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent e) {
-        unsaved_changes = true;
-        b_saveConfig.setDisable(false);
-        displayStage.setX(Integer.parseInt(tf_x.getText()));
-        displayStage.setY(Integer.parseInt(tf_y.getText()));
-        displayStage.setWidth(Integer.parseInt(tf_w.getText()));
-        displayStage.setHeight(Integer.parseInt(tf_h.getText()));
+        changeTF();
       }
     };
 
@@ -574,10 +623,61 @@ public class SBScreen extends Application {
     primaryStage.setTitle("Songbase Screen");
     primaryStage.setResizable(false);
     primaryStage.show();
+    
+    // Catch tabs on text fields.
+    
+    
+    
+    tf_w.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent ke) {
+        if (ke.getCode()==KeyCode.TAB) updateVal(tf_w);
+      }
+    });
+    
+    tf_h.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent ke) {
+        if (ke.getCode()==KeyCode.TAB) updateVal(tf_h);
+      }
+    });
+    
+    tf_x.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent ke) {
+        if (ke.getCode()==KeyCode.TAB) updateVal(tf_x);
+      }
+    });
+    
+    tf_y.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent ke) {
+        if (ke.getCode()==KeyCode.TAB) updateVal(tf_y);
+      }
+    });
+    
+    tf_port.setOnKeyReleased(new EventHandler<KeyEvent>() {
+      public void handle(KeyEvent ke) {
+        if (ke.getCode()==KeyCode.TAB) updateVal(tf_y);
+      }
+    });
 
 
   }
+  
 
+  void changeTF() {
+    unsaved_changes = true;
+    b_saveConfig.setDisable(false);
+    displayStage.setX(Integer.parseInt(tf_x.getText()));
+    displayStage.setY(Integer.parseInt(tf_y.getText()));
+    displayStage.setWidth(Integer.parseInt(tf_w.getText()));
+    displayStage.setHeight(Integer.parseInt(tf_h.getText()));
+  }
+  
+  void updateVal(TextField tf) {
+    try {
+      Integer.parseInt(tf.getText());
+      changeTF();
+    } catch (Exception e) { tf.setText("0"); }
+  }
+  
   public void createDummyXML() {
     try {
       PrintWriter PW = new PrintWriter(new File("configs.xml"));

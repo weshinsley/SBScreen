@@ -26,11 +26,13 @@ public class WebServer {
   public void createServer() {
     try {
       server = HttpServer.create(new InetSocketAddress(port),0);
+      
       server.createContext("/",new WebHandler());
       parent.no_events++;
       this.parent.nl_on.setSelected(true);
       this.parent.tf_port.setDisable(true);
       server.start();
+      
       parent.no_events--;
     } catch (Exception e) {
       if (e instanceof java.net.BindException) {
