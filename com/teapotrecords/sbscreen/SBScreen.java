@@ -68,7 +68,8 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 public class SBScreen extends Application {
-  public final static String sbs_version = "0.24";
+  public final static String sbs_version = "0.25";
+  public final static String date = "16th July 2017";
   
   Stage displayStage;
   boolean unsaved_changes = false;
@@ -299,8 +300,7 @@ public class SBScreen extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose BackDrop Image/Movie");
         fileChooser.getExtensionFilters().addAll(
-            new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-            new ExtensionFilter("Movie Files", "*.mp4", "*.avi", "*.wmv", "*.mov"),
+            new ExtensionFilter("Pictures and Movies", "*.png", "*.jpg", "*.gif","*.mp4", "*.avi", "*.wmv", "*.mov"),
             new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(_stage);
         if (selectedFile != null) {
@@ -450,7 +450,7 @@ public class SBScreen extends Application {
         Alert info = new Alert(AlertType.INFORMATION);
         info.setTitle("About SBScreen");
         info.setHeaderText("SBScreen "+sbs_version);
-        info.setContentText("15 July 2017\nwes@teapotrecords.co.uk\nhttps://github.com/weshinsley/SBScreen"); 
+        info.setContentText(date+"\nwes@teapotrecords.co.uk\nhttps://github.com/weshinsley/SBScreen"); 
         info.show();
       }
     });
