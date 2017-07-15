@@ -67,7 +67,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public class SBScreen extends Application {
-  public final static String sbs_version = "0.21 BETA";
+  public final static String sbs_version = "0.22 BETA";
   
   Stage displayStage;
   boolean unsaved_changes = false;
@@ -350,7 +350,6 @@ public class SBScreen extends Application {
     
     nl_on.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent e) {
-        System.out.println("ON: ne="+no_events);
         if (no_events==0) {
           no_events++;
           webServer.setEnabled(true);

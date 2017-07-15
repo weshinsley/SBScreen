@@ -9,8 +9,9 @@ import com.teapotrecords.sbscreen.network.WebListener;
 import javafx.application.Platform;
 
 public class UpdateListener implements WebListener {
-  private final String LYRICS_TAG = "lyrics";
-  private final String COMMAND_TAG = "command";
+  public static final String LYRICS_TAG = "lyrics";
+  public static final String COMMAND_TAG = "command";
+  public static final String INFO_TAG = "info";  
   private Decoder b64decode = Base64.getDecoder();
   public SBScreen parent = null;
   private String remember_html = "";

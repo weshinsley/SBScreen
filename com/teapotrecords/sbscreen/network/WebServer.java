@@ -12,6 +12,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.teapotrecords.sbscreen.SBScreen;
+import com.teapotrecords.sbscreen.UpdateListener;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -26,7 +27,6 @@ public class WebServer {
   public void createServer() {
     try {
       server = HttpServer.create(new InetSocketAddress(port),0);
-      
       server.createContext("/",new WebHandler());
       parent.no_events++;
       this.parent.nl_on.setSelected(true);
@@ -58,12 +58,11 @@ public class WebServer {
   }
   
   public void setEnabled(boolean en) {
-    if (server==null) createServer();
-    
     if (en) { 
       if (server!=null) {
         server.start();
-      }
+      } else createServer();
+      
     } else {
       if (server!=null) {
         server.stop(0);
@@ -103,6 +102,9 @@ public class WebServer {
          
        }
        String response = "OK";
+       if (key_values.get(UpdateListener.COMMAND_TAG).equals(UpdateListener.INFO_TAG)) {
+         response = "SBS\t"+SBScreen.sbs_version;
+       }
        t.sendResponseHeaders(200, response.length());
        OutputStream os = t.getResponseBody();
        os.write(response.getBytes());
