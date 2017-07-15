@@ -65,9 +65,10 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 public class SBScreen extends Application {
-  public final static String sbs_version = "0.22";
+  public final static String sbs_version = "0.24";
   
   Stage displayStage;
   boolean unsaved_changes = false;
@@ -145,7 +146,17 @@ public class SBScreen extends Application {
       mp = new MediaPlayer(m);
       mv = new MediaView(mp);
       displayStageSP.getChildren().add(mv);
-      mp.setCycleCount(MediaPlayer.INDEFINITE);
+      if (System.getProperty("os.name").equals("Mac OS X")) {
+        mp.setCycleCount(1);
+        mp.setOnEndOfMedia(new Runnable() {
+          public void run() {
+            mp.seek(Duration.ZERO);
+            mp.play();
+          }
+        });
+      } else {
+        mp.setCycleCount(MediaPlayer.INDEFINITE);
+      }
       final DoubleProperty width = mv.fitWidthProperty();
       final DoubleProperty height = mv.fitHeightProperty();
       width.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
