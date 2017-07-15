@@ -68,7 +68,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 public class SBScreen extends Application {
-  public final static String sbs_version = "0.25";
+  public final static String sbs_version = "0.28";
   public final static String date = "16th July 2017";
   
   Stage displayStage;
