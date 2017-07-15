@@ -297,8 +297,10 @@ public class SBScreen extends Application {
         }
         unsaved_changes = true;
         b_saveConfig.setDisable(false);
-        hideDisplayScreen(true);
-        showDisplayScreen(true);
+        if (rb_on.isSelected()) {
+          hideDisplayScreen(true);
+          showDisplayScreen(true);
+        }
       }
     });
     tf_backdrop.setEditable(false);
