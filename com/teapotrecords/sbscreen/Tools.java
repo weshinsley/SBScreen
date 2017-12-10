@@ -283,7 +283,7 @@ public class Tools {
   public static void writeXML(Element root,String file) {
     try {
       TransformerFactory tf = TransformerFactory.newInstance();
-      tf.setAttribute("indent-number",new Integer(2));
+      tf.setAttribute("indent-number",2);
       Transformer t = tf.newTransformer();
       
       t.setOutputProperty(OutputKeys.INDENT,"yes");
