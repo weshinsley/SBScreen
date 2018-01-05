@@ -1,53 +1,68 @@
 package com.teapotrecords.sbapp;
 
-import javafx.application.Application;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-public class SBApp extends Application {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+
+public class SBApp {
   final static String version = "0.1";
-  Menu mFile = new Menu("_File");
-  MenuBar topMenu = new MenuBar();
-  MenuItem miExit = new MenuItem("E_xit");
-  SBEventHandler eh = new SBEventHandler();
-  
+  JFrame sbApp = new JFrame();
+  JMenu mFile = new JMenu("File");
+  JMenuBar topMenu = new JMenuBar();
+  JMenuItem miNew = new JMenuItem("New");;
+  JMenuItem miOpen = new JMenuItem("Open");
+  JMenuItem miExit = new JMenuItem("Exit");
+  SBEventHandler eh = new SBEventHandler();  
   public void initMenus() {
-    topMenu.getMenus().addAll(mFile);
-    mFile.getItems().addAll(miExit);
-    miExit.setMnemonicParsing(true);
-    miExit.setOnAction(eh);
-  }
+    miNew.setMnemonic(KeyEvent.VK_N);
+    miOpen.setMnemonic(KeyEvent.VK_O);
+    mFile.setMnemonic(KeyEvent.VK_F);
+    miExit.setMnemonic(KeyEvent.VK_X);
+    mFile.add(miNew);
+    mFile.add(miOpen);
+    mFile.add(miExit);
+    topMenu.add(mFile);
+    miExit.addActionListener(eh);
+    sbApp.setJMenuBar(topMenu);
+  }    
+  
   
   public static void main(String[] args) {
-    launch(args);
-
-  }
-
-  @Override
-  public void start(Stage stage) throws Exception {
-    initMenus();
-    stage.setTitle("BFree "+version);
-    Scene scene = new Scene(new VBox(), 600,480);
-    ((VBox) scene.getRoot()).getChildren().addAll(topMenu);
-    stage.setScene(scene);
-    stage.show();
-    
-    
-  }
-  
-  
-  
-  class SBEventHandler implements EventHandler {
-    public void handle(Event t) {
-      if (t.getSource()==miExit) {
-        System.out.println("Exit");
+    final SBApp sb = new SBApp();
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        sb.runApp();
       }
+    });
+  }
+
+  private void runApp() {
+    sbApp = new JFrame("BFree "+version);
+    sbApp.setSize(640, 480);
+    sbApp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    initMenus();
+    sbApp.setVisible(true);
+    
+    
+    
+  }
+  
+  
+  
+  class SBEventHandler implements ActionListener {
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource()==miExit) {
+        System.exit(0);
+      } 
     }
+    
   }
 }
