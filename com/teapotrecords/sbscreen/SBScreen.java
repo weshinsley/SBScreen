@@ -3,6 +3,7 @@ package com.teapotrecords.sbscreen;
 import java.io.File;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.sun.webkit.WebPage;
 import com.teapotrecords.sbscreen.network.WebServer;
 
 import javafx.application.Application;
@@ -774,8 +774,10 @@ public class SBScreen extends Application {
       try {
         Field f = wdl_webEngine.getClass().getDeclaredField("page");
         f.setAccessible(true);
-        com.sun.webkit.WebPage page = (WebPage) f.get(wdl_webEngine);
-        page.setBackgroundColor((new java.awt.Color(0, 0, 0, 0)).getRGB());
+        Object page = f.get(wdl_webEngine);
+        Method meth = page.getClass().getMethod("setBackgroundColor",int.class);
+        meth.setAccessible(true);
+        meth.invoke(page, (new java.awt.Color(0, 0, 0, 0)).getRGB());
       } catch (Exception e) {
         e.printStackTrace();
       }
